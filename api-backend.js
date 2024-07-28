@@ -75,13 +75,53 @@ var webserver = app.listen(webPort, function () {
 console.log('Running Environment: ' + env);
 
 const init = async () => {
+  //process.setMaxListeners(0);
+  require('events').defaultMaxListeners = 0;
+  process.setMaxListeners(0);
+
+  var fs = require('fs');
+
+  var tls = {
+      key: fs.readFileSync('server.key'),
+      cert: fs.readFileSync('server.crt')
+  };
+
   const server = hapi.Server({
     port: hapiPort,
     host: hapiHost,
+    tls: tls,
     routes: {
-      cors: true,
+        cors: {
+          origin: ['*'], // Allow all origins
+          headers: ["Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Accept", "Authorization", "Content-Type", "If-None-Match", "Accept-language"],
+          additionalHeaders: ["Access-Control-Allow-Headers: Origin, Content-Type, x-ms-request-id , Authorization"],
+          credentials: true
+        }
     },
   });
+  await server.register(require('@hapi/inert'));
+
+    await server.register(AuthBearer);
+
+    server.auth.strategy('simple', 'bearer-access-token', {
+        allowQueryToken: true,              // optional, false by default
+        validate: async (request, token, h) => {
+
+            // here is where you validate your token
+            // comparing with token from your database for example
+            const isValid = token === 'wdaKMweCT337lorzr1d58djCVRGZXr1tbLualEVY45martFUa08pmuh1vPV5hLY83wmxYOFuq7d4DbmA7T6R0zsj3bphcPEku8vP';
+
+            const credentials = { token };
+            const artifacts = { test: 'info' };
+
+            return { isValid, credentials, artifacts };
+        }
+    });
+
+    server.auth.default('simple');
+
+    //-- Route ------
+
   // API TEST CONFIG
   server.route({
     method: 'GET',
