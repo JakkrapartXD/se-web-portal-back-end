@@ -91,13 +91,8 @@ const init = async () => {
     host: hapiHost,
     tls: tls,
     routes: {
-        cors: {
-          origin: ['*'], // Allow all origins
-          headers: ["Access-Control-Allow-Headers", "Access-Control-Allow-Origin", "Accept", "Authorization", "Content-Type", "If-None-Match", "Accept-language"],
-          additionalHeaders: ["Access-Control-Allow-Headers: Origin, Content-Type, x-ms-request-id , Authorization"],
-          credentials: true
+        cors: true,
         }
-    },
   });
   await server.register(require('@hapi/inert'));
 
@@ -1352,6 +1347,15 @@ const init = async () => {
   server.route({
     method: 'POST',
     path: '/api/Teacher_list',
+    config: {
+      payload: {
+        multipart: true,
+      },
+      cors: {
+        origin: ['*'],
+        additionalHeaders: ['cache-control', 'x-requested-width'],
+      },
+    },
     handler: async function (reply) {
       try {
         const responseData = await teacher.teacher_detaill.thecher_list();
