@@ -31,9 +31,9 @@ const dashboard = require('./respository/Portal/dashborad');
 // --------------- env -----------------------------------
 const env = require('./env.js');
 //---------------- Websocket -----------------------------
-const hapiPort = 3000;
-const webSocketPort = 3201;
-const webPort = 3280;
+const hapiPort = 8081;
+//const webSocketPort = 3201;
+//const webPort = 3280;
 const hapiHost = getIPAddress();
 //---------------- COOKIE --------------------------------
 // const cookie = require('cookie-parser');
@@ -64,10 +64,10 @@ app.use('/', router);
 // app.use(cookie());
 
 app.use(express.static('static'));
-var webserver = app.listen(webPort, function () {
-  console.log('Websockets listening on port: ' + webSocketPort);
-  console.log('Webserver running on port: ' + webPort);
-});
+// var webserver = app.listen(webPort, function () {
+//   console.log('Websockets listening on port: ' + webSocketPort);
+//   console.log('Webserver running on port: ' + webPort);
+// });
 
 //var env = process.env.NODE_ENV || 'development';
 //var env = process.env.NODE_ENV || 'production';
@@ -81,15 +81,9 @@ const init = async () => {
 
   var fs = require('fs');
 
-  var tls = {
-      key: fs.readFileSync('server.key'),
-      cert: fs.readFileSync('server.crt')
-  };
-
   const server = hapi.Server({
     port: hapiPort,
-    host: '127.0.0.1',
-    tls: tls,
+    host: '0.0.0.0',
     routes: {
         cors: true,
         }
